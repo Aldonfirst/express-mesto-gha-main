@@ -13,7 +13,7 @@ module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => {
-      res.send(card);
+      res.status(201).send(card);
     })
     .catch((err) => handleErrorMessage(err, res));
 };
@@ -26,7 +26,7 @@ module.exports.deleteCard = (req, res) => {
       }
       return res.send(card);
     })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => handleErrorMessage(err, res));
 };
 
 module.exports.likeCard = (req, res) => {

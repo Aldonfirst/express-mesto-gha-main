@@ -3,8 +3,9 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
+const { PORT, DB_URL } = require('./utils/constants');
 
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
+mongoose.connect(DB_URL, {
   useNewUrlParser: true,
 })
   .then(() => {
@@ -29,6 +30,6 @@ app.use((req, _res, next) => {
   next();
 });
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
   console.log('Cервер запущен!');
 });

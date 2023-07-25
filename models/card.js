@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { validationMessage } = require('../errorMessage');
+const URL_REGEX = require('../utils/constants');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -11,6 +12,10 @@ const cardSchema = new mongoose.Schema({
   link: {
     type: String,
     required: [true, validationMessage.required],
+    validate: {
+      validator: (url) => URL_REGEX.isUrl(url),
+      message: ' Тут должна быть URL ссылка  изображения ',
+    },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,

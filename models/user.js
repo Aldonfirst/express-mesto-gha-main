@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { validationMessage } = require('../errorMessage');
+const URL_REGEX = require('../utils/constants');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -17,6 +18,10 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     required: [true, validationMessage.required],
+    validate: {
+      validator: (url) => URL_REGEX.isUrl(url),
+      message: 'Тут должна быть URL ссылка  изображения',
+    },
   },
 }, { versionKey: false });
 

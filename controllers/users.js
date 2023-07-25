@@ -22,15 +22,13 @@ module.exports.getUserById = (req, res) => {
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500)
-      .send({ message: err.message }));
+    .then((user) => res.status(201).send({ data: user }))
+    .catch((err) => handleErrorMessage(err, res));
 };
 
 module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
   const userId = req.user._id;
-
   User.findByIdAndUpdate(userId, { name, about }, { new: true })
     .then((updatedUser) => {
       if (!updatedUser) {
@@ -45,7 +43,6 @@ module.exports.updateUser = (req, res) => {
 module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
   const userId = req.user._id;
-
   User.findByIdAndUpdate(userId, { avatar }, { new: true })
     .then((updatedUser) => {
       if (!updatedUser) {
