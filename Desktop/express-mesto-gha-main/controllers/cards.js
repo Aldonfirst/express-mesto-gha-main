@@ -1,13 +1,5 @@
 const Card = require('../models/card');
-
-const handleErrorMessage = (err, res) => {
-  if (err.name === 'ValidationError') {
-    res.status(400)
-      .send({ message: 'Переданы некорректные данные' });
-  } else {
-    res.status(500).send({ message: err.message });
-  }
-};
+const { handleErrorMessage } = require('../errorMessage');
 
 module.exports.getCards = (req, res) => {
   Card.find()

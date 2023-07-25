@@ -14,3 +14,17 @@
 
 `npm run start` — запускает сервер   
 `npm run dev` — запускает сервер с hot-reload
+<<<<<<< HEAD
+=======
+
+
+Данный проект находится на гитхаб по ссылке:
+https://github.com/Aldonfirst/express-mesto-gha.git
+
+В нем описана архитектурная часть проекта Mesto.
+
+Для реализации использовался :
+Node.js ,
+библиотека Express.js ,
+Обработчик баз данных mongoDB
+>>>>>>> 27f42aa (13 prac)

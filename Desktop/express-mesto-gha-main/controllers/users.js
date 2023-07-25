@@ -1,13 +1,5 @@
 const User = require('../models/user');
-
-const handleErrorMessage = (err, res) => {
-  if (err.name === 'MessageError') {
-    res.status(400)
-      .send({ message: 'Переданы некорректные данные при создании пользователя.' });
-  } else {
-    res.status(500).send({ message: err.message });
-  }
-};
+const { handleErrorMessage } = require('../errorMessage');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
