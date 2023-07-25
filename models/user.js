@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { validationMessage } = require('../errorMessage');
+const { validationMessage } = require('../utils/errorMessage');
 const URL_REGEX = require('../utils/constants');
 
 const userSchema = new mongoose.Schema({
