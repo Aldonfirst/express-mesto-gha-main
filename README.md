@@ -17,7 +17,7 @@
 
 
 Данный проект находится на гитхаб по ссылке:
-https://github.com/Aldonfirst/express-mesto-gha.git
+https://github.com/Aldonfirst/express-mesto-gha-main.git
 
 В нем описана архитектурная часть проекта Mesto.
 
