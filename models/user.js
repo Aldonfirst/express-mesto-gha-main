@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { validationMessage } = require('../utils/errorMessage');
-const URL_REGEX = require('../utils/constants');
+
+const URL_REGEX = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
 
 const userSchema = new mongoose.Schema({
   name: {

@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
-const { PORT, DB_URL } = require('./utils/constants');
 
+const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 mongoose.connect(DB_URL, {
   useNewUrlParser: true,
 })
@@ -24,7 +24,7 @@ app.use(usersRouter);
 
 app.use((req, _res, next) => {
   req.user = {
-    _id: '64bea5d245134caf3b614212',
+    _id: '64c26a5b49108a0730f64cf4',
   };
 
   next();
