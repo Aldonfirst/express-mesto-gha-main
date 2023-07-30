@@ -1,9 +1,9 @@
 const handleErrorMessage = (err, res) => {
   if (err.name === 'ValidationError') {
     res.status(400)
-      .send({ message: 'Переданы некорректные данные' });
+      .send({ message: err.message });
   } else {
-    res.status(500).send({ message: err.message });
+    res.status(500).send({ message: 'Ошибка на стороне сервера' });
   }
 };
 
