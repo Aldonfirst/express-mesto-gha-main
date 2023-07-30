@@ -2,33 +2,17 @@ const Card = require('../models/card');
 const { handleErrorMessage } = require('../utils/errorMessage');
 
 module.exports.getCards = (req, res) => {
-  Card.find()
-    .then((cards) => {
-      res.send(cards);
-    })
+  Card.find({})
+    .populate(['owner', 'likes'])
+    .then((cards) => res.send(cards))
     .catch((err) => handleErrorMessage(err, res));
 };
-
-// module.exports.createCard = (req, res) => {
-//   const { name, link } = req.body;
-//   Card.create({ name, link, owner: req.user._id })
-//     .then((card) => {
-//       res.status(201).send(card);
-//     })
-//     .catch((err) => handleErrorMessage(err, res));
-// };
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => {
-      Card.populate(card, { path: 'owner', select: 'name' }, (err, populatedCard) => {
-        if (err) {
-          handleErrorMessage(err, res);
-        } else {
-          res.status(201).send(populatedCard);
-        }
-      });
+      res.status(201).send(card);
     })
     .catch((err) => handleErrorMessage(err, res));
 };
