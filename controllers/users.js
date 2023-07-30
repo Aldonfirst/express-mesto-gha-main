@@ -38,7 +38,7 @@ module.exports.updateUser = (req, res) => {
         return res.status(404)
           .send({ message: 'Пользователь с указанным _id не найден.' });
       }
-      return res.send(updatedUser);
+      return res.send({ data: { name: updatedUser.name, about: updatedUser.about } });
     })
     .catch((err) => handleErrorMessage(err, res));
 };
@@ -52,7 +52,7 @@ module.exports.updateAvatar = (req, res) => {
         return res.status(404)
           .send({ message: 'Пользователь с указанным _id не найден. ' });
       }
-      return res.send(updatedUser);
+      return res.send({ data: { avatar: updatedUser.avatar } });
     })
     .catch((err) => handleErrorMessage(err, res));
 };
