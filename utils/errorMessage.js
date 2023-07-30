@@ -1,5 +1,5 @@
 const handleErrorMessage = (err, res) => {
-  if (err.name === 'CastError') {
+  if (err.name === 'ValidtionError') {
     res.status(400)
       .send({ message: 'Переданы некорректные данные' });
   } else {

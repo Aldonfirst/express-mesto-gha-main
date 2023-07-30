@@ -9,11 +9,26 @@ module.exports.getCards = (req, res) => {
     .catch((err) => handleErrorMessage(err, res));
 };
 
+// module.exports.createCard = (req, res) => {
+//   const { name, link } = req.body;
+//   Card.create({ name, link, owner: req.user._id })
+//     .then((card) => {
+//       res.status(201).send(card);
+//     })
+//     .catch((err) => handleErrorMessage(err, res));
+// };
+
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
     .then((card) => {
-      res.status(201).send(card);
+      Card.populate(card, { path: 'owner', select: 'name' }, (err, populatedCard) => {
+        if (err) {
+          handleErrorMessage(err, res);
+        } else {
+          res.status(201).send(populatedCard);
+        }
+      });
     })
     .catch((err) => handleErrorMessage(err, res));
 };
