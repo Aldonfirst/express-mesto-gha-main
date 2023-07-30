@@ -4,7 +4,7 @@ const { handleErrorMessage } = require('../utils/errorMessage');
 
 module.exports.getUsers = (req, res) => {
   User.find()
-    .then((users) => res.status(200).json({ data: users }))
+    .then((users) => res.status(200).json(users))
     .catch((err) => handleErrorMessage(err, res));
 };
 
@@ -15,7 +15,7 @@ module.exports.getUserById = (req, res) => {
         if (!user) {
           return res.status(404).json({ message: 'Пользователь по указанному _id не найден.' });
         }
-        return res.status(200).json({ data: user });
+        return res.status(200).json(user);
       })
       .catch((err) => handleErrorMessage(err, res));
   } else {
@@ -26,7 +26,7 @@ module.exports.getUserById = (req, res) => {
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
-    .then((user) => res.status(201).json({ data: user }))
+    .then((user) => res.status(201).json(user))
     .catch((err) => handleErrorMessage(err, res));
 };
 
@@ -38,7 +38,7 @@ module.exports.updateUser = (req, res) => {
       if (!updatedUser) {
         return res.status(404).json({ message: 'Пользователь с указанным _id не найден.' });
       }
-      return res.status(200).json({ data: updatedUser });
+      return res.status(200).json(updatedUser);
     })
     .catch((err) => handleErrorMessage(err, res));
 };
@@ -51,7 +51,7 @@ module.exports.updateAvatar = (req, res) => {
         return res.status(404)
           .send({ message: 'Пользователь с указанным _id не найден. ' });
       }
-      return res.status(200).json({ data: updatedUser });
+      return res.status(200).json(updatedUser);
     })
     .catch((err) => handleErrorMessage(err, res));
 };
