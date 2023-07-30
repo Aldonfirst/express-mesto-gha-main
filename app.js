@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use('/cards', cardsRouter);
-app.use(usersRouter);
+app.use('/users', usersRouter);
 
 app.use((req, _res, next) => {
   req.user = {
