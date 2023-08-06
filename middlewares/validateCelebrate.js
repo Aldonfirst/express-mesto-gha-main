@@ -1,28 +1,61 @@
-const Joi = require('joi');
+const { celebrate, Joi, Segments } = require('celebrate');
+const { URL_REGEX } = require('../utils/constants');
 
-const userSchema = Joi.object({
-  name: Joi.string()
-    .min(2)
-    .max(30)
-    .default('Жак-Ив Кусто')
-    .required(),
-  about: Joi.string()
-    .min(2)
-    .max(30)
-    .default('Исследователь')
-    .required(),
-  avatar: Joi.string()
-    .pattern(/^(http|https):\/\/(www\.)?([a-zA-Z0-9.-]+)\.([a-zA-Z]{2,5})(\/[a-zA-Z0-9]*)*$/)
-    .default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png')
-    .required(),
-  email: Joi.string()
-    .pattern(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/)
-    .email()
-    .required(),
-  password: Joi.string()
-    .required(),
+const validateSignUp = celebrate({
+  [Segments.BODY]: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().pattern(URL_REGEX),
+    email: Joi.string().email().required(),
+    password: Joi.string().required().min(6),
+  }),
+});
+
+const validateLogin = celebrate({
+  [Segments.BODY]: Joi.object().keys({
+    email: Joi.string().email().required(),
+    password: Joi.string().required().min(6),
+  }),
+});
+
+const validateUpdateProfile = celebrate({
+  [Segments.BODY]: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+  }),
+});
+
+const validateUpdateAvatar = celebrate({
+  [Segments.BODY]: Joi.object().keys({
+    avatar: Joi.string().pattern(URL_REGEX),
+  }),
+});
+
+const validateUserId = celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    userId: Joi.string().hex().length(24),
+  }),
+});
+
+const validateCardId = celebrate({
+  [Segments.PARAMS]: Joi.object().keys({
+    cardId: Joi.string().hex().length(24),
+  }),
+});
+
+const validateCreateCard = celebrate({
+  [Segments.BODY]: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string().required().pattern(URL_REGEX),
+  }),
 });
 
 module.exports = {
-  userSchema,
+  validateSignUp,
+  validateLogin,
+  validateUpdateProfile,
+  validateUpdateAvatar,
+  validateUserId,
+  validateCardId,
+  validateCreateCard,
 };

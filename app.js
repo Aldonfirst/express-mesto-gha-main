@@ -2,9 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-// const { errors } = require('celebrate');
-const { userSchema } = require('./middlewares/validateCelebrate');
-const validateRequest = require('./middlewares/validateRequest');
+// const limiter = require('limiter');
+const { errors } = require('celebrate');
+const { authMiddleware } = require('./middlewares/auth');
+
+const { validateSignUp, validateLogin } = require('./middlewares/validateCelebrate');
 
 const { login, createUser } = require('./controllers/users');
 
@@ -21,14 +23,16 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
+// app.use(limiter);
 
-app.use('/signup', validateRequest(userSchema), createUser);
-app.use('/signin', login);
+app.use('/signup', validateSignUp, createUser);
+app.use('/signin', validateLogin, login);
 
+app.use(authMiddleware);
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
-// app.use(errors);
+app.use(errors);
 app.use(errorHandler);
 app.use(helmet());
 

@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
     // match: [/^(http|https):\/\/[^ "]+$/, validationMessage.url],
     validate: {
       validator: (url) => validator.isURL(url),
-      message: 'Ошибка ввода, тут должен быть URL',
+      message: validationMessage.url,
     },
   },
   email: {
@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema({
     // match: [/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/, validationMessage.email],
     validate: {
       validator: (text) => validator.isEmail(text),
-      message: 'Ошибка ввода email',
+      message: validationMessage.email,
     },
   },
   password: {

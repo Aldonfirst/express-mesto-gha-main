@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const User = require('../models/user');
 const { CustomError } = require('../middlewares/errorHandler');
+const { SECRET_KEY } = require('../utils/constants');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -41,10 +42,9 @@ module.exports.login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user || !bcrypt.compareSync(password, user.password)) {
-        res.status(401).send({ message: 'Неправильная почта или пароль' });
-        return;
+        throw new CustomError(409);
       }
-      const token = jwt.sign({ _id: user._id }, 'secret', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, SECRET_KEY, { expiresIn: '7d' });
       res.cookie('token', token, { httpOnly: true }).send(token);
     })
     .catch((err) => next(err));

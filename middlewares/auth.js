@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { CustomError } = require('./errorHandler');
+const { SECRET_KEY } = require('../utils/constants');
 
 function authMiddleware(req, res, next) {
   if (!req.headers.authorization) {
@@ -7,7 +8,7 @@ function authMiddleware(req, res, next) {
   }
   const token = req.headers.authorization.replace('Bearer ', '');
   try {
-    const payload = jwt.verify(token, 'secret');
+    const payload = jwt.verify(token, SECRET_KEY);
     req.user = payload;
     next();
   } catch (err) {

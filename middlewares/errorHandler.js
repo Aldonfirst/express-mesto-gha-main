@@ -23,6 +23,15 @@ const errorHandler = (err, req, res, next) => {
     statusCode = 401;
     errorMessage = 'Передан неверный логин или пароль';
   }
+
+  if (err.name === 'ValidationError') {
+    statusCode = 400;
+    errorMessage = 'Ошибка валидации';
+  } else if (err.name === 'CastError') {
+    statusCode = 400;
+    errorMessage = 'Некорректный _id пользователя';
+  }
+
   if (statusCode === 404) {
     errorMessage = 'Объект с указанным _id не найден';
   }
