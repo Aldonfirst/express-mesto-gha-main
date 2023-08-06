@@ -1,57 +1,89 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const User = require('../models/user');
-const { handleErrorMessage } = require('../utils/errorMessage');
+const { CustomError } = require('../middlewares/errorHandler');
 
-module.exports.getUsers = (req, res) => {
-  User.find()
-    .then((users) => res.status(200).json(users))
-    .catch((err) => handleErrorMessage(err, res));
+module.exports.getUsers = (req, res, next) => {
+  User.find({})
+    .then((users) => res.json(users))
+    .catch((err) => next(err));
 };
 
-module.exports.getUserById = (req, res) => {
-  if (mongoose.Types.ObjectId.isValid(req.params.userId)) {
-    User.findById(req.params.userId)
+module.exports.getUserById = (req, res, next) => {
+  const { userId } = req.params;
+  if (mongoose.Types.ObjectId.isValid(userId)) {
+    User.findById(userId)
       .then((user) => {
         if (!user) {
-          return res.status(404).json({ message: 'Пользователь по указанному _id не найден.' });
+          throw new CustomError(404);
         }
-        return res.status(200).json(user);
+        return res.json({ data: user });
       })
-      .catch((err) => handleErrorMessage(err, res));
-  } else {
-    res.status(400).json({ message: 'Неверный Id' });
+      .catch((err) => next(err));
   }
 };
-
-module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => res.status(201).json(user))
-    .catch((err) => handleErrorMessage(err, res));
+// регистрация
+module.exports.createUser = (req, res, next) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  User.create({
+    name, about, avatar, email, password: hashedPassword,
+  })
+    .then((user) => res.status(201).send({ data: user }))
+    .catch((err) => next(err));
 };
-
-module.exports.updateUser = (req, res) => {
-  const { name, about } = req.body;
+// авторизация
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+  User.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user || !bcrypt.compareSync(password, user.password)) {
+        res.status(401).send({ message: 'Неправильная почта или пароль' });
+        return;
+      }
+      const token = jwt.sign({ _id: user._id }, 'secret', { expiresIn: '7d' });
+      res.cookie('token', token, { httpOnly: true }).send(token);
+    })
+    .catch((err) => next(err));
+};
+// users/me возврат пользователя
+module.exports.getUserInfo = (req, res, next) => {
   const userId = req.user._id;
-  User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
-    .then((updatedUser) => {
-      if (!updatedUser) {
-        return res.status(404).json({ message: 'Пользователь с указанным _id не найден.' });
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        throw new CustomError(404);
       }
-      return res.status(200).json(updatedUser);
+      res.send(user);
     })
-    .catch((err) => handleErrorMessage(err, res));
+    .catch((err) => next(err));
 };
 
-module.exports.updateAvatar = (req, res) => {
-  const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: 'true', runValidators: true })
+module.exports.updateUser = (req, res, next) => {
+  const { name, about } = req.body;
+  const { _id } = req.user;
+  User.findByIdAndUpdate(_id, { name, about }, { new: true, runValidators: true })
     .then((updatedUser) => {
       if (!updatedUser) {
-        return res.status(404)
-          .send({ message: 'Пользователь с указанным _id не найден. ' });
+        throw new CustomError(404);
       }
-      return res.status(200).json(updatedUser);
+      return res.send(updatedUser);
     })
-    .catch((err) => handleErrorMessage(err, res));
+    .catch((err) => next(err));
+};
+
+module.exports.updateAvatar = (req, res, next) => {
+  const { avatar } = req.body;
+  const { _id } = req.user;
+  User.findByIdAndUpdate(_id, { avatar }, { new: true, runValidators: true })
+    .then((updatedUser) => {
+      if (!updatedUser) {
+        throw new CustomError(404);
+      }
+      return res.send(updatedUser);
+    })
+    .catch((err) => next(err));
 };
