@@ -71,7 +71,7 @@ module.exports.getUserInfo = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден');
       }
-      res.send(user);
+      res.status(200).send(user);
     })
     .catch((err) => next(err));
 };

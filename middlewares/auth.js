@@ -13,7 +13,6 @@ function authMiddleware(req, res, next) {
   try {
     const payload = jwt.verify(token, SECRET_KEY);
     req.user = payload;
-    next();
   } catch (err) {
     next(err);
   }
