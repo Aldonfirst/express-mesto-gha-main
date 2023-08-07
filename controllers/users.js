@@ -6,7 +6,6 @@ const { SECRET_KEY } = require('../utils/constants');
 const NotFoundError = require('../utils/errorsCatch/NotFoundError');
 const ConflictError = require('../utils/errorsCatch/ConflictError');
 const UnauthorizedError = require('../utils/errorsCatch/UnauthorizedError');
-// const BadRequestError = require('../utils/errorsCatch/BadRequestError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
