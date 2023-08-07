@@ -13,14 +13,10 @@ function authMiddleware(req, res, next) {
   try {
     const payload = jwt.verify(token, SECRET_KEY);
     req.user = payload;
+    next();
   } catch (err) {
-    if (err.message === 'JsonWebTokenError' || err.message === 'TokenExpiredError') {
-      throw new UnauthorizedError('Невалидный токен или истек срок его действия');
-    } else {
-      throw new UnauthorizedError(err.message);
-    }
+    next(err);
   }
-  next();
 }
 
 module.exports = {
