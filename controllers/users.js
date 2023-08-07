@@ -2,8 +2,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const User = require('../models/user');
-const { CustomError } = require('../middlewares/errorHandler');
 const { SECRET_KEY } = require('../utils/constants');
+const NotFoundError = require('../utils/errorsCatch/NotFoundError');
+const ConflictError = require('../utils/errorsCatch/ConflictError');
+const UnauthorizedError = require('../utils/errorsCatch/UnauthorizedError');
+// const BadRequestError = require('../utils/errorsCatch/BadRequestError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -17,7 +20,7 @@ module.exports.getUserById = (req, res, next) => {
     User.findById(userId)
       .then((user) => {
         if (!user) {
-          throw new CustomError('Пользователь не найден', 404);
+          throw new NotFoundError('Пользователь не найден');
         }
         return res.json(user);
       })
@@ -33,8 +36,15 @@ module.exports.createUser = (req, res, next) => {
   User.create({
     name, about, avatar, email, password: hashedPassword,
   })
-    .then((user) => res.status(201).send(user))
-    .catch((err) => next(err));
+    .then(() => res.status(201).send({
+      name, about, avatar, email,
+    }))
+    .catch((err) => {
+      if (err.name === 'MongoServerError' && err.code === 11000) {
+        return next(new ConflictError('Пользователь с таким Email уже зарегистрирован'));
+      }
+      return next(err);
+    });
 };
 // авторизация
 module.exports.login = (req, res, next) => {
@@ -42,7 +52,7 @@ module.exports.login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user || !bcrypt.compareSync(password, user.password)) {
-        throw new CustomError(409);
+        throw new UnauthorizedError('Ошибка при авторизации пользователя');
       }
       const token = jwt.sign(
         { _id: user._id },
@@ -50,7 +60,7 @@ module.exports.login = (req, res, next) => {
         { expiresIn: '7d' },
       );
       res.cookie('token', token, { httpOnly: true })
-        .send(token);
+        .send({ token });
     })
     .catch((err) => next(err));
 };
@@ -60,7 +70,7 @@ module.exports.getUserInfo = (req, res, next) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        throw new CustomError('Пользователь не найден', 404);
+        throw new NotFoundError('Пользователь не найден');
       }
       res.send(user);
     })

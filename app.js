@@ -2,13 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-// const limiter = require('limiter');
+const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
-const { authMiddleware } = require('./middlewares/auth');
-
-const { validateSignUp, validateLogin } = require('./middlewares/validateCelebrate');
-
-const { login, createUser } = require('./controllers/users');
+const router = require('./routes/routes');
 
 const errorHandler = require('./middlewares/errorHandler');
 
@@ -22,19 +18,13 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(errors());
 app.use(express.json());
-// app.use(limiter);
-
-app.use('/signup', validateSignUp, createUser);
-app.use('/signin', validateLogin, login);
-
-app.use(authMiddleware);
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
-
-app.use(errors);
-app.use(errorHandler);
+app.use(cookieParser());
 app.use(helmet());
+app.use(router);
+app.use(errors());
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log('Cервер запущен!');

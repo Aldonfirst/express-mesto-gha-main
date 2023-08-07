@@ -1,46 +1,32 @@
-class CustomError extends Error {
-  constructor(message, statusCode) {
-    super(message);
-    this.statusCode = statusCode;
-  }
-}
+// Мидлвэр для централизованной обработки ошибок
+const NotFoundError = require('../utils/errorsCatch/NotFoundError');
+const ConflictError = require('../utils/errorsCatch/ConflictError');
+const BadRequestError = require('../utils/errorsCatch/BadRequestError');
+const UnauthorizedError = require('../utils/errorsCatch/UnauthorizedError');
+const ForbiddenError = require('../utils/errorsCatch/ForbiddenError');
 
 const errorHandler = (err, req, res, next) => {
-  let statusCode = 500;
-  let errorMessage = 'Ошибка на стороне сервера';
+  let status = err.status || 500;
+  let message = err.message || 'Внутренняя ошибка сервера';
 
-  if (err instanceof CustomError) {
-    statusCode = err.statusCode;
-    errorMessage = err.message;
-  }
-
-  if (err.code === 11000) {
-    statusCode = 409;
-    errorMessage = 'При регистрации указан email, который уже существует';
-  }
-
-  if (err.name === 'JsonWebTokenError') {
-    statusCode = 401;
-    errorMessage = 'Передан неверный логин или пароль';
-  }
-
-  if (err.name === 'ValidationError') {
-    statusCode = 400;
-    errorMessage = 'Ошибка валидации';
-  } else if (err.name === 'CastError') {
-    statusCode = 400;
-    errorMessage = 'Некорректный _id пользователя';
+  if (err instanceof BadRequestError) {
+    status = 400;
+    message = err.message || 'Некорректный _id пользователя';
+  } else if (err instanceof NotFoundError) {
+    status = 404;
+    message = err.message || 'Объект не найден';
+  } else if (err instanceof UnauthorizedError) {
+    status = 401;
+    message = err.message || 'Передан неверный логин или пароль';
+  } else if (err instanceof ForbiddenError) {
+    status = 403;
+    message = err.message || 'Вы пытаетесь удалить чужую карточку';
+  } else if (err instanceof ConflictError) {
+    status = 409;
+    message = err.message || 'При регистрации указан email, который уже существует';
   }
 
-  if (statusCode === 404) {
-    errorMessage = 'Объект с указанным _id не найден';
-  }
-  res.status(statusCode).json({
-    error: errorMessage,
-  });
-  if (!res.headersSent) {
-    next();
-  }
+  res.status(status).json({ error: message });
+  next(err);
 };
-
 module.exports = errorHandler;

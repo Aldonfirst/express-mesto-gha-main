@@ -1,5 +1,6 @@
 const Card = require('../models/card');
-const { CustomError } = require('../middlewares/errorHandler');
+const NotFoundError = require('../utils/errorsCatch/NotFoundError');
+const ForbiddenError = require('../utils/errorsCatch/ForbiddenError');
 
 module.exports.getCards = (req, res, next) => {
   Card.find()
@@ -22,9 +23,9 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        throw new CustomError(404);
+        throw new NotFoundError('Карточка не найдена');
       } else if (card.owner.toString() !== req.user._id) {
-        res.status(403).send({ message: 'Нет прав для удаления карточки' });
+        throw new ForbiddenError('Нет прав для удаления карточки');
       } else {
         Card.findByIdAndRemove(cardId)
           .then((removedCard) => {
@@ -43,7 +44,7 @@ module.exports.likeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new CustomError(404);
+        throw new NotFoundError('Карточка не найдена');
       }
       return res.send(card);
     })
@@ -58,7 +59,7 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .then((card) => {
       if (!card) {
-        throw new CustomError(404);
+        throw new NotFoundError('Карточка не найдена');
       }
       return res.send(card);
     })
