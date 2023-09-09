@@ -1,17 +1,22 @@
 const router = require('express').Router();
 const { authMiddleware } = require('../middlewares/auth');
 const usersRouter = require('./userRoutes');
-const cardsRouter = require('./cardsRoutes');
+const moviesRouter = require('./moviesRoutes');
 
 const NotFoundError = require('../utils/errorsCatch/NotFoundError');
 const { login, createUser } = require('../controllers/users');
 
-const { validateSignUp, validateLogin } = require('../middlewares/validateCelebrate');
+const { validateRegister, validateLogin } = require('../middlewares/validateCelebrate');
 
-router.post('/signup', validateSignUp, createUser);
+router.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+
+router.post('/signup', validateRegister, createUser);
 router.post('/signin', validateLogin, login);
 
-// мидлвара auth
 router.use(authMiddleware);
 
 router.get('/signout', (req, res) => {
@@ -19,10 +24,10 @@ router.get('/signout', (req, res) => {
 });
 
 router.use(usersRouter);
-router.use(cardsRouter);
+router.use(moviesRouter);
 
 router.use('*', (req, res, next) => {
-  next(new NotFoundError('Страница не найдена 404 '));
+  next(new NotFoundError('Страница не найдена  '));
 });
 
 module.exports = router;
